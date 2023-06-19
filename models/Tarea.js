@@ -1,7 +1,7 @@
 import {Schema, model, Types} from "mongoose";
 
 
-const proyectosSchema = Schema({
+const tareaSchema = Schema({
     nombre:{
         type: String,
         trim: true,
@@ -12,27 +12,26 @@ const proyectosSchema = Schema({
         trim: true,
         required: true
     },
+    estado: {
+        type: Boolean,
+        default: false
+    },
     fechaEntrega:{
         type: Date,
+        required: true,
         default: Date.now()
     },
-    cliente:{
+    prioridad:{
         type: String,
-        trim: true,
-        required: true
+        required: true,
+        enum: ["Baja", "Media", "Alta"]
     },
-    creador:{
+    proyecto:{
         type: Types.ObjectId,
-        ref: 'Usuario'
-    },
-    colaboradores: [
-        {
-            type: Types.ObjectId,
-            ref: 'Usuario' 
-        }
-    ]
+        ref: 'Proyecto'
+    }
 }, {timestamps: true})
 
-const Proyecto = model('Proyecto', proyectosSchema)
+const Tarea = model('Tarea', tareaSchema)
 
-export default(Proyecto)
+export default(Tarea)
