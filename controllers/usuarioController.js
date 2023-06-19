@@ -108,6 +108,10 @@ const nuevoPassword = async(req, res) => {
         res.json({msg: error.message})
     }
 }
+const perfil = async(req, res) => {
+    const {usuario} = req
+    res.json(usuario)
+}
 
 export {
     registrar, 
@@ -115,5 +119,6 @@ export {
     confirmar,
     olvidePassword,
     validarToken,
-    nuevoPassword
+    nuevoPassword,
+    perfil
 }

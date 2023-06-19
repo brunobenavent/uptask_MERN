@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 
 import usuarioRoutes from './routes/usuarioRoutes.js'
+import proyectoRoutes from './routes/proyectoRoutes.js'
+
 import conectarDB from './config/db.js'
 import 'dotenv/config'
 
@@ -31,6 +33,7 @@ app.use(express.json())
 
 // Routing
 app.use('/api/usuarios',usuarioRoutes )
+app.use('/api/proyectos', proyectoRoutes )
 
 
 const PORT = process.env.PORT || 4000
