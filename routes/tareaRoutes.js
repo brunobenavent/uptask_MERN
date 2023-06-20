@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { obtenerTareas } from "../controllers/proyectoController.js";
 import {
         agregarTarea,
         obtenerTarea,

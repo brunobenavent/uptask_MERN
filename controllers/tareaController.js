@@ -27,15 +27,71 @@ const agregarTarea = async(req, res) => {
 }
 
 const obtenerTarea = async(req, res) => {
-    console.log('obteniendo tareas')
+    const {id} = req.params
+
+    let tarea
+    if(Types.ObjectId.isValid(id)){
+        tarea = await Tarea.findById(id).populate('proyecto')
+    }else{
+        const error = new Error('La Tarea no fue encontrada')
+        return res.status(404).json({msg: error.message})
+    }
+
+    if(tarea.proyecto.creador.toString() !== req.usuario._id.toString()){
+        const error = new Error('Acción no valida');
+        return res.status(403).json({msg: error.message})
+    }
+    res.json(tarea)
 }
 
 const actualizarTarea = async(req, res) => {
-    console.log('editando tarea')
+    const {id} = req.params
+
+    let tarea
+    if(Types.ObjectId.isValid(id)){
+        tarea = await Tarea.findById(id).populate('proyecto')
+    }else{
+        const error = new Error('La Tarea no fue encontrada')
+        return res.status(404).json({msg: error.message})
+    }
+
+    if(tarea.proyecto.creador.toString() !== req.usuario._id.toString()){
+        const error = new Error('Acción no valida');
+        return res.status(403).json({msg: error.message})
+    }
+
+    try {
+        const tareaAlmacenada = await Tarea.findByIdAndUpdate(id, req.body, {new: true})
+        res.json(tareaAlmacenada)
+        
+    } catch (error) {
+        console.log(error.message)
+    } 
 }
 
 const eliminarTarea = async(req, res) => {
-    console.log('eliminando tarea')
+    const {id} = req.params
+
+    let tarea
+    if(Types.ObjectId.isValid(id)){
+        tarea = await Tarea.findById(id).populate('proyecto')
+    }else{
+        const error = new Error('La Tarea no fue encontrada')
+        return res.status(404).json({msg: error.message})
+    }
+
+    if(tarea.proyecto.creador.toString() !== req.usuario._id.toString()){
+        const error = new Error('Acción no valida');
+        return res.status(403).json({msg: error.message})
+    }
+
+    try {
+        const tareaEliminada = await Tarea.findByIdAndDelete(id)
+        res.json(tareaEliminada)
+        
+    } catch (error) {
+        console.log(error.message)
+    }
 }
 
 const cambiarEstado = async(req, res) => {
