@@ -1,3 +1,4 @@
+import {emailOlvidePassword, emailRegistro} from "../helpers/email.js"
 import { generarId } from "../helpers/generarId.js"
 import generarJWT from "../helpers/generarJWT.js"
 import Usuario from "../models/Usuario.js"
@@ -12,6 +13,7 @@ const registrar = async(req, res) => {
     try {
         const usuario = new Usuario(req.body)
         const usuarioAlmacenado = await usuario.save()
+        emailRegistro(usuarioAlmacenado)
         
         res.json(usuarioAlmacenado)
     } catch (error) {
@@ -75,6 +77,7 @@ const olvidePassword = async(req, res) => {
     try {
         usuario.token = generarId()
         await usuario.save()
+        emailOlvidePassword(usuario.email, usuario.token, usuario.nombre)
         res.json({msg: 'Hemos enviado un email con las instrucciones para resetear tu password'})
     } catch (error) {
         res.json({msg: error.message})
@@ -93,6 +96,7 @@ const validarToken = async(req, res) => {
 const nuevoPassword = async(req, res) => {
     const {token} = req.params
     const {password} = req.body
+    console.log(req.body)
     //Comprobar que el token es válido
     const usuario = await Usuario.findOne({token})
     if(!usuario){
