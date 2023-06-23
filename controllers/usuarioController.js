@@ -43,8 +43,7 @@ const autenticar = async(req, res) => {
         return res.status(403).json({msg: error.message}) 
     }
     usuario.token = generarJWT(usuario._id)
-
-    res.json({usuario})
+    res.json(usuario)
 }
 
 const confirmar = async(req, res) => {
