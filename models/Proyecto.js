@@ -25,6 +25,12 @@ const proyectosSchema = Schema({
         type: Types.ObjectId,
         ref: 'Usuario'
     },
+    tareas: [
+        {
+            type: Types.ObjectId,
+            ref: "Tarea"
+        }
+    ],
     colaboradores: [
         {
             type: Types.ObjectId,

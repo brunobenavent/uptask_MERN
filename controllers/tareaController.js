@@ -20,7 +20,9 @@ const agregarTarea = async(req, res) => {
     const tarea = new Tarea(req.body)
     try {
         const tareaAlmacenada = await tarea.save()
+        proyecto.tareas.push(tarea._id)
         res.json(tareaAlmacenada)
+        await proyecto.save()
     } catch (error) {
         console.log(error.message)
     }
@@ -86,6 +88,7 @@ const eliminarTarea = async(req, res) => {
     }
 
     try {
+
         const tareaEliminada = await Tarea.findByIdAndDelete(id)
         res.json(tareaEliminada)
         
