@@ -3,7 +3,7 @@ import Proyecto from "../models/Proyecto.js"
 import Tarea from "../models/Tarea.js"
 
 const obtenerProyectos = async(req, res) => {
-    const proyectos = await Proyecto.find().where('creador').equals(req.usuario._id)
+    const proyectos = await Proyecto.find().where('creador').equals(req.usuario._id).select('-tareas')
     res.json(proyectos)
 }
 
@@ -24,7 +24,7 @@ const obtenerProyecto = async (req, res) => {
     let proyecto;
     
     if(Types.ObjectId.isValid(id)){
-      proyecto = await Proyecto.findById(id);
+      proyecto = await Proyecto.findById(id).populate('tareas')
     } else { 
       const error = new Error('El proyecto no fue encontrado');
       return res.status(404).json({ msg: error.message});
