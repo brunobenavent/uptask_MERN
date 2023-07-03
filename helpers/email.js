@@ -27,7 +27,7 @@ const emailOlvidePassword = async (email, token, nombre) => {
                     <div class="mail__content bg-white p-8 shadow-md">
 
                         <div class="content__header text-center tracking-wide border-b">
-                            <div class="text-red text-4xl font-black">upTask</div>
+                            <div class="text-red text-6xl font-black">upTask</div>
                             <h1 class="text-xl h-48 flex items-center justify-center">Confirma tu Cuenta</h1>
                         </div>
 
@@ -96,7 +96,7 @@ const emailRegistro = async datos => {
                     <div class="mail__content bg-white p-8 shadow-md">
 
                         <div class="content__header text-center tracking-wide border-b">
-                            <div class="text-red text-sm font-bold">upTask</div>
+                            <div class="text-red text-6xl font-bold">upTask</div>
                             <h1 class="text-3xl h-48 flex items-center justify-center">Confirmacion de E-mail</h1>
                         </div>
 
