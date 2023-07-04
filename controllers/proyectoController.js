@@ -1,6 +1,5 @@
 import { Types } from "mongoose"
 import Proyecto from "../models/Proyecto.js"
-import Tarea from "../models/Tarea.js"
 import Usuario from "../models/Usuario.js"
 
 const obtenerProyectos = async(req, res) => {
@@ -39,7 +38,7 @@ const obtenerProyecto = async (req, res) => {
       const error = new Error('El proyecto no fue encontrado');
       return res.status(404).json({ msg: error.message});
     }
-    if(proyecto.creador.toString() !== req.usuario._id.toString()){
+    if(proyecto.creador.toString() !== req.usuario._id.toString() && !proyecto.colaboradores.some(colaborador => colaborador._id.toString()===req.usuario._id.toString())){
       const error = new Error('Acción no valida');
       return res.status(401).json({msg: error.message})
     }
