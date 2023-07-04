@@ -4,7 +4,16 @@ import Tarea from "../models/Tarea.js"
 import Usuario from "../models/Usuario.js"
 
 const obtenerProyectos = async(req, res) => {
-    const proyectos = await Proyecto.find().where('creador').equals(req.usuario._id).select('-tareas')
+    const proyectos = await Proyecto.find({
+
+      $or : [
+        {'colaboradores': {$in: req.usuario}},
+        {'creador': {$in: req.usuario}},
+      ]
+    })
+    // .where('creador')
+    // .equals(req.usuario._id)
+    .select('-tareas')
     res.json(proyectos)
 }
 
@@ -108,74 +117,54 @@ const buscarColaborador = async(req, res) => {
 
 const agregarColaborador = async(req, res) => {
     const {email} = req.body
-    const {id} = req.params
-
-    // Verificar que el usuario existe
-    const usuario = await Usuario.findOne({email}).select('-password -confirmado -createdAt -updatedAt -__v -token')
-    const proyecto = await Proyecto.findById(id)
+    const proyecto = await Proyecto.findById(req.params.id);
     if(!proyecto) {
       const error = new Error('El Proyecto no se encontró')
       return res.status(404).json({msg: error.message})
     }
+
+    // Verificar que el usuario existe
+    const usuario = await Usuario.findOne({email}).select('-password -confirmado -createdAt -updatedAt -__v -token')
 
     if(!usuario){
       const error = new Error('El usuario que desea agregar no existe')
       return res.status(404).json({msg: error.message})
     }
-     // Verificar que el que esta añadiendo al colaborador es el creador del proyecto
-    if(proyecto.creador.toString() !== req.usuario._id.toString()){
-      const error = new Error('Acción no válida')
-      return res.status(404).json({msg: error.message})
+  
+    // El colaborador no es el admin del proyecto
+    if (proyecto.creador.toString() === usuario._id.toString()) {
+      const error = new Error("El Creador del Proyecto no puede ser colaborador");
+      return res.status(404).json({ msg: error.message });
     }
-
-     // Verificar que no se está intentando agragar de colaborador al creador
-      if(req.usuario._id.toString() === proyecto.creador.toString()){
-        const error = new Error('Eres el creador, no puedes añadirte a tí mismo')
-        return res.status(404).json({msg: error.message})
-      }
-      if(proyecto.colaboradores.includes(usuario._id)){
-        const error = new Error('El colaborador ya estaba agregado al proyecto')
-        return res.status(404).json({msg: error.message})
-      }
-      try {
-        proyecto.colaboradores = [...proyecto.colaboradores, usuario._id]
-        await proyecto.save()
-        res.json({msg: 'Colaborador agregado correctamente'})
-      } catch (error) {
-        console.log(error.message)
-      }
+    
+    // Revisar que no este ya agregado al proyecto
+    if (proyecto.colaboradores.includes(usuario._id)) {
+      const error = new Error("El Usuario ya pertenece al Proyecto");
+      return res.status(404).json({ msg: error.message });
+    }
+    // Esta bien, se puede agregar
+    proyecto.colaboradores.push(usuario._id);
+    await proyecto.save();
+    res.json({ msg: "Colaborador Agregado Correctamente" })
 }
 
 const eliminarColaborador = async(req, res) => {
-    const {id} = req.params
+  const proyecto = await Proyecto.findById(req.params.id);
 
-    const proyecto = await Proyecto.findById(id)
-    if(!proyecto) {
-      const error = new Error('El Proyecto no se encontró')
-      return res.status(404).json({msg: error.message})
-    }
-     // Verificar que el que esta eliminando al colaborador es el creador del proyecto
-    if(proyecto.creador.toString() !== req.usuario._id.toString()){
-      const error = new Error('Acción no válida')
-      return res.status(404).json({msg: error.message})
-    }
+  if (!proyecto) {
+    const error = new Error("Proyecto No Encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
 
-     // Verificar que no se está intentando eliminar al creador
-      if(req.usuario._id.toString() === proyecto.creador.toString()){
-        const error = new Error('Eres el creador, no puedes eliminarte a tí mismo')
-        return res.status(404).json({msg: error.message})
-      }
-    
-      try {
-        proyecto.colaboradores.pull(req.body.id)
-        console.log(colaboradores)
-        return
+  if (proyecto.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error("Acción no válida");
+    return res.status(404).json({ msg: error.message });
+  }
 
-        await proyecto.save()
-        res.json({msg: 'Colaborador eliminado correctamente'})
-      } catch (error) {
-        console.log(error.message)
-      }
+  // Esta bien, se puede eliminar
+  proyecto.colaboradores.pull(req.body.id);
+  await proyecto.save();
+  res.json({ msg: "Colaborador Eliminado Correctamente" });
 }
 
 export{
